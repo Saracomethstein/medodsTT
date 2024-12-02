@@ -1,6 +1,11 @@
 package models
 
-type Request struct {
-	UserID string `json:"user_id"`
-	IP     string `json:"ip"`
+import (
+	"context"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+func ConnectDB(databaseURL string) (*pgxpool.Pool, error) {
+	return pgxpool.New(context.Background(), databaseURL)
 }

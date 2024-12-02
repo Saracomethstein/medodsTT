@@ -41,5 +41,5 @@ docker-down:
 
 docker-pull:
 	docker pull ubuntu:latest
-	docker pull golang:1.21.1
+	docker pull golang:1.22.3
 	docker pull postgres:13

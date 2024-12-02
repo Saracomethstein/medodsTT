@@ -10,7 +10,7 @@ services:
       POSTGRES_DB: medods
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./scripts:/docker-entrypoint-initdb.d/init.sql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - backend
     ports:
@@ -25,18 +25,14 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: medods-app
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: root
-      DB_NAME: medods
     depends_on:
       - db
     networks:
       - backend
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     deploy:
       resources:
         limits:

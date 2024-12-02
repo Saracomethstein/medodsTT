@@ -1,16 +1,7 @@
 -- Tables for database medods.
 
--- Config for connecting:
--- const (
--- 	host     = "localhost"
--- 	port     = 5432
--- 	user     = "postgres"
--- 	password = "root"
--- 	dbname   = "medods"
--- )
-
 CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY, // uuidv4? //
+    id UUID PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
