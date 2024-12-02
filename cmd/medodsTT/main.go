@@ -12,19 +12,22 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
+	err := godotenv.Load("/app/.env")
 	if err != nil {
 		log.Println("No .env file found. Falling back to system environment variables.")
+		return
 	}
 
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		log.Fatal("DATABASE_URL is not set")
+		return
 	}
 
 	db, err := models.ConnectDB(dbURL)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
+		return
 	}
 	defer db.Close()
 
@@ -37,5 +40,5 @@ func main() {
 	e.POST("/auth/refresh", authHandler.RefreshToken)
 
 	log.Println("Server is running on port 8080")
-	log.Fatal(e.Start(":8080"))
+	log.Fatal(e.Start(":8000"))
 }
