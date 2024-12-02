@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    container_name: medodods-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: medods
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend
+    ports:
+      - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medods-app
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: root
+      DB_NAME: medods
+    depends_on:
+      - db
+    networks:
+      - backend
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+volumes:
+  pgdata:
+
+networks:
+  backend:

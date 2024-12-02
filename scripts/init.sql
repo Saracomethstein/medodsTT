@@ -1,10 +1,21 @@
-CREATE TABLE users (
+-- Tables for database medods.
+
+-- Config for connecting:
+-- const (
+-- 	host     = "localhost"
+-- 	port     = 5432
+-- 	user     = "postgres"
+-- 	password = "root"
+-- 	dbname   = "medods"
+-- )
+
+CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY, // uuidv4? //
     email VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE refresh_tokens (
+CREATE TABLE IF NOT EXISTS refresh_tokens (
     id SERIAL PRIMARY KEY,
     user_id UUID REFERENCES users(id),
     token_hash VARCHAR(255) NOT NULL,
