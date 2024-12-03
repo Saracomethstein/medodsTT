@@ -6,7 +6,6 @@ import (
 	"medodsTT/internal/handlers"
 	"medodsTT/internal/repositories"
 	"medodsTT/internal/services"
-	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -15,7 +14,7 @@ import (
 func main() {
 	db, err := repositories.SetupDB()
 	if err != nil {
-		fmt.Sprint(os.Stderr, "Can not open db connnection")
+		fmt.Println("Can not open db connnection")
 		return
 	}
 

@@ -6,16 +6,16 @@ import (
 )
 
 type ServiceContainer struct {
-	GenerateService *GenerateService
-	RefreshService  *RefreshService
+	GenerateService *TokenService
+	RefreshService  *TokenService
 }
 
 func NewServiceContainer(db *sql.DB) *ServiceContainer {
-	generateRepo := repositories.NewGenerateRepository(db)
-	refreshRepo := repositories.NewRefreshRepository(db)
+	generateRepo := repositories.NewTokenRepository(db)
+	refreshRepo := repositories.NewTokenRepository(db)
 
 	return &ServiceContainer{
-		GenerateService: NewGenerateService(*generateRepo),
-		RefreshService:  NewRefreshService(*refreshRepo),
+		GenerateService: NewTokenService(*generateRepo),
+		RefreshService:  NewTokenService(*refreshRepo),
 	}
 }

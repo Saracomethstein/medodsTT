@@ -1,11 +1,16 @@
 package models
 
-import (
-	"context"
+type TokenRequest struct {
+	UserID string `json:"user_id" validate:"required,uuid"`
+	IP     string `json:"ip" validate:"required,ip"`
+}
 
-	"github.com/jackc/pgx/v5/pgxpool"
-)
+type TokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
 
-func ConnectDB(databaseURL string) (*pgxpool.Pool, error) {
-	return pgxpool.New(context.Background(), databaseURL)
+type RefreshResponse struct {
+	AccessToken  string `json:"access_token" validate:"required"`
+	RefreshToken string `json:"refresh_token" validate:"required"`
 }
