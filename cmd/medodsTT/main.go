@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"medodsTT/internal/handlers"
 	"medodsTT/internal/models"
 	"os"
 
@@ -35,9 +34,9 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	authHandler := handlers.NewAuthHandler(db)
-	e.POST("/auth/token", authHandler.GenerateToken)
-	e.POST("/auth/refresh", authHandler.RefreshToken)
+	// authHandler := handlers.NewAuthHandler(db)
+	// e.POST("/auth/token", authHandler.GenerateToken)
+	// e.POST("/auth/refresh", authHandler.RefreshToken)
 
 	log.Println("Server is running on port 8080")
 	log.Fatal(e.Start(":8000"))
