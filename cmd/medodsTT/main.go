@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"medodsTT/internal/handlers"
 	"medodsTT/internal/repositories"
@@ -9,14 +8,11 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	db, err := repositories.SetupDB()
-	if err != nil {
-		fmt.Println("Can not open db connnection")
-		return
-	}
+	db := repositories.SetupDB()
 
 	serviceContainer := services.NewServiceContainer(db)
 
