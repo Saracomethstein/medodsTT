@@ -26,7 +26,7 @@ func (s *TokenService) GenerateAccessToken(userID, ip string) (string, error) {
 		"exp": time.Now().Add(15 * time.Minute).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
-	return token.SignedString([]byte("your-secret-key"))
+	return token.SignedString([]byte("J8sK^7z!fA0p@o3wY%M#E1Qx%Rk4U&Nv2KZ"))
 }
 
 func (s *TokenService) GenerateRefreshToken() string {

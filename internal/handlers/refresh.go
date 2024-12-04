@@ -29,7 +29,7 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 
 	claims := jwt.MapClaims{}
 	_, err := jwt.ParseWithClaims(request.AccessToken, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte("your-secret-key"), nil
+		return []byte("J8sK^7z!fA0p@o3wY%M#E1Qx%Rk4U&Nv2KZ"), nil
 	})
 	if err != nil || !claims.VerifyExpiresAt(time.Now().Unix(), true) {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Access token is invalid or expired")
@@ -57,8 +57,8 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save refresh token")
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{
-		"access_token":  newAccessToken,
-		"refresh_token": newRefreshToken,
+	return c.JSON(http.StatusOK, models.TokenResponse{
+		AccessToken:  newAccessToken,
+		RefreshToken: newRefreshToken,
 	})
 }
