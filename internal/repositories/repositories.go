@@ -3,61 +3,65 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"medodsTT/internal/models"
+	"os"
+	"time"
+
+	"github.com/joho/godotenv"
 )
 
 const (
-	host     = "db"
-	port     = 5432
-	user     = "postgres"
-	password = "root"
-	dbname   = "medods"
+	retries = 5
+	delay   = 3 * time.Second
 )
 
 func SetupDB() *sql.DB {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+	conf := getEnv()
 
-	sqldb, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
+	psqlInfo := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		conf.DB_HOST, conf.DB_PORT, conf.DB_USER, conf.DB_PASSWORD, conf.DB_NAME,
+	)
+
+	var db *sql.DB
+	var err error
+	for i := 0; i < retries; i++ {
+		db, err = sql.Open("postgres", psqlInfo)
+
+		if err == nil {
+			err = db.Ping()
+
+			if err == nil {
+				log.Println("Successfully connected to the database.")
+				return db
+			}
+		}
+
+		log.Printf("Retrying to connect to the database (%d/%d): %v", i+1, retries, err)
+		time.Sleep(delay)
 	}
 
-	err = sqldb.Ping()
-	if err != nil {
-		panic(err)
-	}
-	return sqldb
+	log.Fatalf("Failed to connect to the database after %d retries: %v", retries, err)
+	return nil
 }
 
-// func SetupDB() (*sql.DB, error) {
-// 	dbURL, err := loadEnv()
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func getEnv() models.DBConnection {
+	conf := new(models.DBConnection)
 
-// 	sqldb, err := sql.Open("postgres", dbURL)
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: No .env file found. Using system environment variables.")
+	}
 
-// 	err = sqldb.Ping()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return sqldb, nil
-// }
+	conf.DB_HOST = os.Getenv("DB_HOST")
+	conf.DB_PORT = os.Getenv("DB_PORT")
+	conf.DB_USER = os.Getenv("DB_USER")
+	conf.DB_PASSWORD = os.Getenv("DB_PASSWORD")
+	conf.DB_NAME = os.Getenv("DB_NAME")
 
-// func loadEnv() (string, error) {
-// 	err := godotenv.Load("/app/.env")
-// 	if err != nil {
-// 		log.Println("No .env file found. Falling back to system environment variables.")
-// 		return "", err
-// 	}
+	if conf.DB_HOST == "" || conf.DB_PORT == "" || conf.DB_USER == "" || conf.DB_PASSWORD == "" || conf.DB_NAME == "" {
+		log.Fatal("One or more required database environment variables are missing.")
+	}
 
-// 	dbURL := os.Getenv("DATABASE_URL")
-// 	if dbURL == "" {
-// 		log.Fatal("DATABASE_URL is not set")
-// 		return "", err
-// 	}
-// 	return dbURL, nil
-// }
+	return *conf
+}

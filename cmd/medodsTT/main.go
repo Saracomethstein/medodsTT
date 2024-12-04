@@ -13,14 +13,13 @@ import (
 
 func main() {
 	db := repositories.SetupDB()
-
+	defer db.Close()
 	serviceContainer := services.NewServiceContainer(db)
-
-	e := echo.New()
 
 	generateHandler := handlers.NewGenerateHandler(serviceContainer.GenerateService)
 	refreshHandler := handlers.NewRefreshHandler(serviceContainer.RefreshService)
 
+	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
