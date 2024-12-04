@@ -40,16 +40,20 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims")
 	}
 
-	// i check refresh token with bcrypt refesh token (bad idea)
+	ip, ok := claims["ip"].(string)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims: missing IP")
+	}
+
+	log.Println("userID: ", userID, "userIP: ", ip)
+
 	refreshTokenHash := h.RefreshService.GetRefreshTokenHash(userID)
 	err = bcrypt.CompareHashAndPassword([]byte(refreshTokenHash), []byte(request.RefreshToken))
 	if err != nil {
-		log.Println("Token mismatch:", err, "Token in request: ", request.RefreshToken, "Token in data base: ", refreshTokenHash)
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid refresh token")
 	}
 
-	// for generated new access token i need userID and ip (new function)
-	newAccessToken, err := h.RefreshService.GenerateAccessToken(userID, "")
+	newAccessToken, err := h.RefreshService.GenerateAccessToken(userID, ip)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate new access token")
 	}
@@ -57,7 +61,7 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 	newRefreshToken := h.RefreshService.GenerateRefreshToken()
 
 	hashedRefreshToken, _ := bcrypt.GenerateFromPassword([]byte(newRefreshToken), bcrypt.DefaultCost)
-	if err := h.RefreshService.SaveRefreshToken(userID, string(hashedRefreshToken), c.RealIP(), time.Now().Add(7*24*time.Hour)); err != nil {
+	if err := h.RefreshService.SaveRefreshToken(userID, string(hashedRefreshToken), ip, time.Now().Add(7*24*time.Hour)); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save refresh token")
 	}
 
