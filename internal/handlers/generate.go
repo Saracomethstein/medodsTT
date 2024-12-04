@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"medodsTT/internal/models"
 	"medodsTT/internal/services"
 	"net/http"
@@ -30,7 +29,6 @@ func (h *GenerateHandler) GenerateToken(c echo.Context) error {
 	// 	return echo.NewHTTPError(http.StatusUnprocessableEntity, "Validation failed")
 	// }
 
-	log.Println("userID: ", req.UserID, "userIP: ", req.IP)
 	accessToken, err := h.GenerateService.GenerateAccessToken(req.UserID, req.IP)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate access token")

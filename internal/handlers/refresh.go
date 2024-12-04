@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"medodsTT/internal/models"
 	"medodsTT/internal/services"
 	"net/http"
@@ -44,8 +43,6 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims: missing IP")
 	}
-
-	log.Println("userID: ", userID, "userIP: ", ip)
 
 	refreshTokenHash := h.RefreshService.GetRefreshTokenHash(userID)
 	err = bcrypt.CompareHashAndPassword([]byte(refreshTokenHash), []byte(request.RefreshToken))
