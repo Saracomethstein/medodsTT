@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"medodsTT/internal/models"
 	"medodsTT/internal/services"
 	"net/http"
@@ -20,7 +21,6 @@ func NewRefreshHandler(refreshService *services.TokenService) *RefreshHandler {
 }
 
 func (h *RefreshHandler) RefreshToken(c echo.Context) error {
-
 	request := new(models.RefreshResponse)
 
 	if err := c.Bind(&request); err != nil {
@@ -40,11 +40,15 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims")
 	}
 
+	// i check refresh token with bcrypt refesh token (bad idea)
 	refreshTokenHash := h.RefreshService.GetRefreshTokenHash(userID)
-	if refreshTokenHash == "" || bcrypt.CompareHashAndPassword([]byte(refreshTokenHash), []byte(request.RefreshToken)) != nil {
+	err = bcrypt.CompareHashAndPassword([]byte(refreshTokenHash), []byte(request.RefreshToken))
+	if err != nil {
+		log.Println("Token mismatch:", err, "Token in request: ", request.RefreshToken, "Token in data base: ", refreshTokenHash)
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid refresh token")
 	}
 
+	// for generated new access token i need userID and ip (new function)
 	newAccessToken, err := h.RefreshService.GenerateAccessToken(userID, "")
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate new access token")

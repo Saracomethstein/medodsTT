@@ -39,7 +39,12 @@ func (s *TokenService) GenerateRefreshToken() string {
 }
 
 func (s *TokenService) SaveRefreshToken(userID, tokenHash, ip string, expiresAt time.Time) error {
-	err := s.TokenRepository.SaveRefreshToken(userID, tokenHash, ip, expiresAt)
+	err := s.TokenRepository.DeleteOldRefreshTokens(userID)
+	if err != nil {
+		return err
+	}
+
+	err = s.TokenRepository.SaveRefreshToken(userID, tokenHash, ip, expiresAt)
 	if err != nil {
 		return err
 	}

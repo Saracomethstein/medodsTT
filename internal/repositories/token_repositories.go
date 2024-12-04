@@ -27,6 +27,15 @@ func (r *TokenRepository) SaveRefreshToken(userID, tokenHash, ip string, expires
 	return nil
 }
 
+func (r *TokenRepository) DeleteOldRefreshTokens(userID string) error {
+	query := `DELETE FROM refresh_tokens WHERE user_id = $1`
+	_, err := r.DB.Exec(query, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *TokenRepository) GetRefreshTokenHash(userID string) (string, error) {
 	var tokenHash string
 	query := `SELECT token_hash FROM refresh_tokens WHERE user_id = $1 ORDER BY expires_at DESC LIMIT 1`
