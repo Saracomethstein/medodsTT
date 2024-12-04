@@ -1,10 +1,13 @@
 package services
 
 import (
+	"log"
 	"medodsTT/internal/repositories"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/joho/godotenv"
 	"golang.org/x/exp/rand"
 )
 
@@ -49,4 +52,16 @@ func (s *TokenService) GetRefreshTokenHash(userID string) string {
 		return ""
 	}
 	return token
+}
+
+func GetJWTKey() string {
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: No .env file found. Using system environment variables.")
+	}
+
+	key := os.Getenv("JWT_SECRET")
+	if key == "" {
+		log.Fatal("JWT key variables are missing.")
+	}
+	return key
 }
