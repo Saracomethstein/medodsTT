@@ -5,14 +5,14 @@ type TokenRequest struct {
 	IP     string `json:"ip" validate:"required,ip"`
 }
 
+type RefreshRequest struct {
+	AccessToken  string `json:"access_token" validate:"required"`
+	RefreshToken string `json:"refresh_token" validate:"required"`
+}
+
 type TokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
-}
-
-type RefreshResponse struct {
-	AccessToken  string `json:"access_token" validate:"required"`
-	RefreshToken string `json:"refresh_token" validate:"required"`
 }
 
 type DBConnection struct {

@@ -63,7 +63,7 @@ func (s *TokenService) GetRefreshTokenHash(userID string) string {
 	return token
 }
 
-func (s *TokenService) GetClaimsFromJWT(request models.RefreshResponse) (string, string, error) {
+func (s *TokenService) GetClaimsFromJWT(request models.RefreshRequest) (string, string, error) {
 	claims := jwt.MapClaims{}
 
 	_, err := jwt.ParseWithClaims(request.AccessToken, claims, func(token *jwt.Token) (interface{}, error) {
@@ -86,7 +86,7 @@ func (s *TokenService) GetClaimsFromJWT(request models.RefreshResponse) (string,
 	return userID, ip, nil
 }
 
-func (s *TokenService) CompareHash(userID string, request models.RefreshResponse) error {
+func (s *TokenService) CompareHash(userID string, request models.RefreshRequest) error {
 	refreshTokenHash := s.GetRefreshTokenHash(userID)
 	err := bcrypt.CompareHashAndPassword([]byte(refreshTokenHash), []byte(request.RefreshToken))
 	if err != nil {

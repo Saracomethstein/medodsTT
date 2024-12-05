@@ -19,7 +19,7 @@ func NewRefreshHandler(refreshService *services.TokenService) *RefreshHandler {
 }
 
 func (h *RefreshHandler) RefreshToken(c echo.Context) error {
-	request := new(models.RefreshResponse)
+	request := new(models.RefreshRequest)
 
 	if err := c.Bind(&request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")
