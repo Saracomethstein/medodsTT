@@ -4,6 +4,11 @@ BINARY_NAME=build/main
 
 all: run
 
+integration_test:
+	@echo "==> Integration test (start)..."
+	@sh ./integration_tests/script.sh
+	@echo "==> Integration test (end)..."
+
 deps:
 	@echo "==> Installing dependencies..."
 	go mod tidy

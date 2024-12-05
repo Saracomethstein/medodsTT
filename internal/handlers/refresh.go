@@ -25,6 +25,10 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")
 	}
 
+	if err := c.Validate(request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
 	userID, ip, err := h.RefreshService.GetClaimsFromJWT(*request)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, err)
