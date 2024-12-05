@@ -25,7 +25,6 @@ func (h *GenerateHandler) GenerateToken(c echo.Context) error {
 	}
 
 	// if err := c.Validate(req); err != nil {
-	// 	log.Println(err)
 	// 	return echo.NewHTTPError(http.StatusUnprocessableEntity, "Validation failed")
 	// }
 
