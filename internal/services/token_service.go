@@ -26,7 +26,7 @@ func (s *TokenService) GenerateAccessToken(userID, ip string) (string, error) {
 		"exp": time.Now().Add(15 * time.Minute).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
-	return token.SignedString([]byte("J8sK^7z!fA0p@o3wY%M#E1Qx%Rk4U&Nv2KZ"))
+	return token.SignedString([]byte(GetJWTKey()))
 }
 
 func (s *TokenService) GenerateRefreshToken() string {
@@ -60,8 +60,8 @@ func (s *TokenService) GetRefreshTokenHash(userID string) string {
 }
 
 func GetJWTKey() string {
-	if err := godotenv.Load(); err != nil {
-		log.Println("Warning: No .env file found. Using system environment variables.")
+	if err := godotenv.Load("/app/.env"); err != nil {
+		log.Println("Warning: ", err)
 	}
 
 	key := os.Getenv("JWT_SECRET")

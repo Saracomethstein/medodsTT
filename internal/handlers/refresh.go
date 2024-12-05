@@ -28,7 +28,7 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 
 	claims := jwt.MapClaims{}
 	_, err := jwt.ParseWithClaims(request.AccessToken, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte("J8sK^7z!fA0p@o3wY%M#E1Qx%Rk4U&Nv2KZ"), nil
+		return []byte(services.GetJWTKey()), nil
 	})
 	if err != nil || !claims.VerifyExpiresAt(time.Now().Unix(), true) {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Access token is invalid or expired")

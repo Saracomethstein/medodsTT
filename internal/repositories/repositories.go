@@ -49,8 +49,8 @@ func SetupDB() *sql.DB {
 func getEnv() models.DBConnection {
 	conf := new(models.DBConnection)
 
-	if err := godotenv.Load(); err != nil {
-		log.Println("Warning: No .env file found. Using system environment variables.")
+	if err := godotenv.Load("/app/.env"); err != nil {
+		log.Println("Warning: ", err)
 	}
 
 	conf.DB_HOST = os.Getenv("DB_HOST")
