@@ -24,10 +24,6 @@ func (h *GenerateHandler) GenerateToken(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	// if err := c.Validate(req); err != nil {
-	// 	return echo.NewHTTPError(http.StatusUnprocessableEntity, "Validation failed")
-	// }
-
 	accessToken, err := h.GenerateService.GenerateAccessToken(req.UserID, req.IP)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate access token")

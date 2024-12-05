@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -26,35 +25,20 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	claims := jwt.MapClaims{}
-	_, err := jwt.ParseWithClaims(request.AccessToken, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(services.GetJWTKey()), nil
-	})
-	if err != nil || !claims.VerifyExpiresAt(time.Now().Unix(), true) {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Access token is invalid or expired")
-	}
-
-	userID, ok := claims["sub"].(string)
-	if !ok {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims")
-	}
-
-	ip, ok := claims["ip"].(string)
-	if !ok {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims: missing IP")
-	}
-
-	refreshTokenHash := h.RefreshService.GetRefreshTokenHash(userID)
-	err = bcrypt.CompareHashAndPassword([]byte(refreshTokenHash), []byte(request.RefreshToken))
+	userID, ip, err := h.RefreshService.GetClaimsFromJWT(*request)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid refresh token")
+		return echo.NewHTTPError(http.StatusUnauthorized, err)
+	}
+
+	err = h.RefreshService.CompareHash(userID, *request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	}
 
 	newAccessToken, err := h.RefreshService.GenerateAccessToken(userID, ip)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate new access token")
 	}
-
 	newRefreshToken := h.RefreshService.GenerateRefreshToken()
 
 	hashedRefreshToken, _ := bcrypt.GenerateFromPassword([]byte(newRefreshToken), bcrypt.DefaultCost)

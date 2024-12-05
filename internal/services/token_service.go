@@ -2,12 +2,16 @@ package services
 
 import (
 	"log"
+	"medodsTT/internal/models"
 	"medodsTT/internal/repositories"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/joho/godotenv"
+	"github.com/labstack/echo"
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/rand"
 )
 
@@ -57,6 +61,38 @@ func (s *TokenService) GetRefreshTokenHash(userID string) string {
 		return ""
 	}
 	return token
+}
+
+func (s *TokenService) GetClaimsFromJWT(request models.RefreshResponse) (string, string, error) {
+	claims := jwt.MapClaims{}
+
+	_, err := jwt.ParseWithClaims(request.AccessToken, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(GetJWTKey()), nil
+	})
+
+	if err != nil || !claims.VerifyExpiresAt(time.Now().Unix(), true) {
+		return "", "", echo.NewHTTPError(http.StatusUnauthorized, "Access token is invalid or expired").SetInternal(err)
+	}
+
+	userID, ok := claims["sub"].(string)
+	if !ok {
+		return "", "", echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims").SetInternal(err)
+	}
+
+	ip, ok := claims["ip"].(string)
+	if !ok {
+		return "", "", echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims: missing IP").SetInternal(err)
+	}
+	return userID, ip, nil
+}
+
+func (s *TokenService) CompareHash(userID string, request models.RefreshResponse) error {
+	refreshTokenHash := s.GetRefreshTokenHash(userID)
+	err := bcrypt.CompareHashAndPassword([]byte(refreshTokenHash), []byte(request.RefreshToken))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid refresh token").SetInternal(err)
+	}
+	return nil
 }
 
 func GetJWTKey() string {
