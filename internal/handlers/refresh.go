@@ -26,7 +26,7 @@ func (h *RefreshHandler) RefreshToken(c echo.Context) error {
 	}
 
 	if err := c.Validate(request); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, "Validation failed")
 	}
 
 	userID, ip, err := h.RefreshService.GetClaimsFromJWT(*request)

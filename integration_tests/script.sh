@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Function to print success or failure with colored backgrounds
 print_result() {
   if [ "$1" == "SUCCESS" ]; then
-    echo "\033[42m$2\033[0m"
+    echo "\033[42;30m$2\033[0m"
   else
-    echo "\033[41m$2\033[0m"
+    echo "\033[41;30m$2\033[0m" 
   fi
 }
 

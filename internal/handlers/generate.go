@@ -25,7 +25,7 @@ func (h *GenerateHandler) GenerateToken(c echo.Context) error {
 	}
 
 	if err := c.Validate(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, "Validation failed")
 	}
 
 	accessToken, err := h.GenerateService.GenerateAccessToken(req.UserID, req.IP)
